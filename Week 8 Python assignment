@@ -1,0 +1,45 @@
+from vpython import *
+import requests
+
+# Function to fetch weather data
+def get_weather(city):
+    api_key = "your_openweathermap_api_key"  # Replace with your OpenWeatherMap API key
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        weather_data = response.json()
+        return weather_data
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
+# Function to display weather in 3D
+def display_weather_3D(weather_data):
+    scene.background = color.cyan
+    scene.title = f"Weather in {weather_data['name']}"
+
+    # Display temperature
+    temp = weather_data['main']['temp']
+    temperature_text = text(text=f"Temperature: {temp}°C", pos=vector(-5, 3, 0), height=1, color=color.red)
+
+    # Display weather condition
+    condition = weather_data['weather'][0]['description'].capitalize()
+    condition_text = text(text=f"Condition: {condition}", pos=vector(-5, 2, 0), height=1, color=color.green)
+
+    # Create a 3D weather icon (sun for clear, cloud for cloudy, etc.)
+    if "clear" in condition.lower():
+        sphere(pos=vector(0, 0, 0), radius=2, color=color.yellow)  # Sun
+    elif "cloud" in condition.lower():
+        sphere(pos=vector(0, 0, 0), radius=2, color=color.gray)  # Cloud
+    elif "rain" in condition.lower():
+        sphere(pos=vector(0, 0, 0), radius=2, color=color.blue)  # Rain
+        for i in range(5):
+            cylinder(pos=vector(-1 + i, -2, 0), axis=vector(0, -1, 0), radius=0.1, color=color.blue)  # Raindrops
+
+# Main Application
+def main():
+    # Prompt for city
+    city = input("Enter a city name: ")
+    weather_data = get
